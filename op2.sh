@@ -1,28 +1,24 @@
 #!/bin/bash
-
-# تأكد من وجود checkupdates
 if ! command -v checkupdates &> /dev/null; then
-    echo "جارِ تثبيت pacman-contrib..."
+    echo "Installing pacman-contrib..."
     sudo pacman -S --needed pacman-contrib
 fi
 
-# تأكد من وجود yay
 if ! command -v yay &> /dev/null; then
-    echo "⚠️ أداة yay غير مثبتة. هل تريد تثبيتها؟ (y/n): "
+    echo "⚠️yay is not installed do you want to install it? (y/n): "
     read ans
     if [[ "$ans" =~ ^[Yy]$ ]]; then
         sudo pacman -S --needed git base-devel
         git clone https://aur.archlinux.org/yay.git
         cd yay && makepkg -si && cd .. && rm -rf yay
     else
-        echo "لا يمكن تحديث حزم الـ AUR بدون yay."
+        echo "can't update the aur pak without yay"
     fi
 fi
 
-# جلب التحديثات
 updates=$(checkupdates 2>/dev/null)
 
-# إضافة تحديثات AUR لو yay موجود
+
 if command -v yay &> /dev/null; then
     aur_updates=$(yay -Qua 2>/dev/null)
     if [ -n "$aur_updates" ]; then
@@ -30,16 +26,16 @@ if command -v yay &> /dev/null; then
     fi
 fi
 
-# لو مفيش أي تحديثات
+
 if [ -z "$updates" ]; then
-    echo "✅ لا توجد تحديثات متاحة."
+    echo "There is no updates✅"
     exit 0
 fi
 
-echo "📦 التحديثات المتاحة:"
+echo "Avalabile updates:📦"
 echo "$updates" | nl
 
-# إدخال الأرقام المطلوبة
+
 echo
 read -p "أدخل أرقام الحزم التي تريد تحديثها (مفصولة بمسافة): " choices
 
@@ -60,7 +56,7 @@ done
 if [ -n "$selected_packages" ]; then
     echo
     echo "سيتم تحديث: $selected_packages"
-    read -p "هل تريد المتابعة؟ (y/n): " confirm
+    read -p "do you want to continue? (y/n): " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         for pkg in $selected_packages; do
             if pacman -Si "$pkg" &>/dev/null; then
