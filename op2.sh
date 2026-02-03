@@ -37,9 +37,9 @@ echo "$updates" | nl
 
 
 echo
-read -p "أدخل أرقام الحزم التي تريد تحديثها (مفصولة بمسافة): " choices
+read -p "Enter the number of pk(s) and space between them: " choices
 
-# اختيار الحزم
+# chose pkg
 selected_packages=""
 for choice in $choices; do
     pkg=$(echo "$updates" | sed -n "${choice}p" | awk '{print $1}')
@@ -48,14 +48,14 @@ for choice in $choices; do
     elif command -v yay &> /dev/null && yay -Si "$pkg" &>/dev/null; then
         selected_packages="$selected_packages $pkg"
     else
-        echo "⚠️ الحزمة '$pkg' غير موجودة في المستودعات أو AUR."
+        echo "⚠️ '$pkg' Not Found in pacman or AUR"
     fi
 done
 
-# تأكيد التحديث
+# Confirm
 if [ -n "$selected_packages" ]; then
     echo
-    echo "سيتم تحديث: $selected_packages"
+    echo "It will update: $selected_packages"
     read -p "do you want to continue? (y/n): " confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         for pkg in $selected_packages; do
@@ -66,8 +66,8 @@ if [ -n "$selected_packages" ]; then
             fi
         done
     else
-        echo "تم الإلغاء."
+        echo "Canceled"
     fi
 else
-    echo "🚫 لا توجد حزم صالحة للتحديث."
+    echo "🚫There is no Pkg(s) to be updated"
 fi
